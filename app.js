@@ -13,6 +13,8 @@ const mongoose = require('mongoose');
 const connectMongo = require('connect-mongo');
 const expressSession = require('express-session');
 const passport = require('passport');
+const bindUserToViewLocals = require('./middleware/bind-user-to-view-locals');
+const routeGuard = require('./middleware/route-guard');
 
 const app = express();
 
@@ -55,6 +57,10 @@ app.use(
 require('./configure-passport');
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+app.use(bindUserToViewLocals);
+app.use(routeGuard);
 
 app.use('/', indexRouter);
 app.use('/authentication', authenticationRouter);

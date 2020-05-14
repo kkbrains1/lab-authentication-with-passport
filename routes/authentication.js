@@ -5,6 +5,8 @@ const authenticationRouter = Router();
 
 const passport = require('passport');
 
+const routeGuard = require('./../middleware/route-guard');
+
 //Iteration #1: The Sign Up Feature
 
 //Add a new route handler to your /routes/authentication.js file with the endpoint /sign-up and make it render the template in the /views/authentication/sign-up.hbs file.
@@ -35,6 +37,14 @@ authenticationRouter.post('/sign-in',
   })
 );
 
+authenticationRouter.get('/private', routeGuard, (req, res, next) => {
+  res.render('authentication/private');
+});
+
+authenticationRouter.post('./sign-out', (req, res, next) => {
+  req.logout();
+  res.redirect('/');
+});
 
 module.exports = authenticationRouter;
 
