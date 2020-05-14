@@ -9,6 +9,10 @@ const serveFavicon = require('serve-favicon');
 
 const indexRouter = require('./routes/index');
 const authenticationRouter = require('./routes/authentication');
+const mongoose = require('mongoose');
+const connectMongo = require('connect-mongo');
+const expressSession = require('express-session');
+const passport = require('passport');
 
 const app = express();
 
@@ -29,6 +33,28 @@ app.use(
 );
 app.use(serveFavicon(join(__dirname, 'public/images', 'favicon.ico')));
 app.use(express.static(join(__dirname, 'public')));
+
+app.use(
+  expressSession({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 60 * 60 * 24 * 15,
+      sameSite: 'lax',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production'
+    },
+    store: new (connectMongo(expressSession))({
+      mongooseConnection: mongoose.connection,
+      ttl: 60 * 60 * 24
+    })
+  })
+);
+
+require('./configure-passport');
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/authentication', authenticationRouter);
