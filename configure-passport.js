@@ -4,10 +4,12 @@
 
 const passport = require('passport');
 const passportLocal = require('passport-local');
+const passportGithub = require('passport-github');
 const bcrypt = require('bcryptjs');
 const User = require('./models/user');
 
-const PassportLocalStrategy = passportLocal.Strategy;
+const LocalStrategy = passportLocal.Strategy;
+const GithubStrategy = passportGithub.Strategy;
 
 
 //iteration 0: define a serialization and deserialization process.
@@ -31,7 +33,7 @@ passport.deserializeUser((userId, callback) => {
 
 passport.use(
   'sign-up',
-  new PassportLocalStrategy({}, (username, password, callback) => {
+  new LocalStrategy({}, (username, password, callback) => {
     // Perform your authentication logic and call the callback function,
     // passing it null in the first parameter and the user document in the second
     bcrypt
@@ -53,7 +55,7 @@ passport.use(
 
 passport.use(
   'sign-in',
-  new PassportLocalStrategy({}, (username, password, callback) => {
+  new LocalStrategy({}, (username, password, callback) => {
     let user;
     User.findOne({
       username
@@ -66,7 +68,7 @@ passport.use(
         if (comparison) {
           callback(null, user);
         } else {
-          return Promise.reject(new Error('Password is incorrect, pelase try again'));
+          return Promise.reject(new Error('Password is incorrect, please try again'));
         }
       })
       .catch(error => {
@@ -76,3 +78,42 @@ passport.use(
 );
 
 
+passport.use(
+  new GithubStrategy(
+    {
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: 'http://localhost:3000/authentication/github-callback',
+      scope: 'user'
+    },
+    (accessToken, refreshToken, profile, callback) => {
+      console.log(profile);
+      const name = profile.displayName;
+      const email = profile.emails ? profile.emails[0].value : null;
+      const photo = profile._json.avatar_url;
+      const githubId = profile.id;
+
+      User.findOne({
+        githubId
+      })
+        .then(user => {
+          if (user) {
+            return Promise.resolve(user);
+          } else {
+            return User.create({
+              name,
+              email,
+              photo,
+              githubId
+            });
+          }
+        })
+        .then(user => {
+          callback(null, user);
+        })
+        .catch(error => {
+          callback(error);
+        });
+    }
+  )
+);

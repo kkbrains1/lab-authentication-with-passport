@@ -13,8 +13,10 @@
         <form action="/authentication/sign-out" method="POST">
           <button>Sign Out</button>
         </form>
+
         <a href="/authentication/private">Private - Keep Out!</a>
         {{else}}
+        <a href="/authentication/github">Sign In with GitHub</a>
         <a href="/authentication/sign-in">Sign In</a>
         <a href="/authentication/sign-up">Sign Up</a>
       {{/if}}
