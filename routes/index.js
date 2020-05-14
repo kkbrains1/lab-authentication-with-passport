@@ -11,7 +11,7 @@ router.get('/authentication/private', routeGuard, (req, res, next) => {
 });
 
 router.get('/', (req, res, next) => {
-  res.render('index', { title: 'Hello World!' });
+  res.render('index');
 });
 
 

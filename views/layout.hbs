@@ -10,11 +10,12 @@
       <a href="/">Home</a>
       {{#if user}}
         <!-- <a href="/">{{user.name}}'s Profile</a> -->
-        <form action="/authentication/sign-out" method="POST">
+        <form action="/authentication/sign-out" method="POST" id="sign-out">
           <button>Sign Out</button>
         </form>
-
+        <img class="profile-picture" src="{{user.photo}}" alt="profile picture">
         <a href="/authentication/private">Private - Keep Out!</a>
+        
         {{else}}
         <a href="/authentication/github">Sign In with GitHub</a>
         <a href="/authentication/sign-in">Sign In</a>
