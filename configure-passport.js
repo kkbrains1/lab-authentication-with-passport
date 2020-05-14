@@ -51,6 +51,28 @@ passport.use(
   })
 );
 
-
+passport.use(
+  'sign-in',
+  new PassportLocalStrategy({}, (username, password, callback) => {
+    let user;
+    User.findOne({
+      username
+    })
+      .then(result => {
+        user = result;
+        return bcrypt.compare(password, user.passwordHash);
+      })
+      .then(comparison => {
+        if (comparison) {
+          callback(null, user);
+        } else {
+          return Promise.reject(new Error('Password is incorrect, pelase try again'));
+        }
+      })
+      .catch(error => {
+        callback(error);
+      });
+  })
+);
 
 

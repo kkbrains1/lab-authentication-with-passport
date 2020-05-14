@@ -24,7 +24,16 @@ authenticationRouter.post('/sign-up',
   })
 );
 
+authenticationRouter.get('/sign-in', (req, res, next) => {
+  res.render('authentication/sign-in');
+});
 
+authenticationRouter.post('/sign-in', 
+  passport.authenticate('sign-in', {
+    successRedirect: '/',
+    failureRedirect: '/authentication/sign-up'
+  })
+);
 
 
 module.exports = authenticationRouter;
